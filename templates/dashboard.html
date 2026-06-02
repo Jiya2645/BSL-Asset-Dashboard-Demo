@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>BSL Asset Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+          filename='css/dashboard.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <img src="{{ url_for('static',
+        filename='images/logo.png') }}"
+        class="sidebar-logo"
+        alt="Logo">
+
+        <h2>BSL Assets</h2>
+
+        <a href="/dashboard">
+            📊 Dashboard
+        </a>
+
+        <a href="/logout">
+            🚪 Logout
+        </a>
+
+    </div>
+
+    <!-- Main Content -->
+
+    <div class="main">
+
+        <div class="header">
+
+            <div>
+
+                <h1>Asset Dashboard</h1>
+
+                <p>
+                    Welcome back,
+                    {{ user.name }}
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Search -->
+
+        <input type="text"
+               id="searchBox"
+               placeholder="🔍 Search Employee, Department, Host Name...">
+
+        <!-- Filters -->
+
+        <div class="filters">
+
+            <select id="departmentFilter">
+
+                <option value="">
+                    All Departments
+                </option>
+
+            </select>
+
+            <select id="locationFilter">
+
+                <option value="">
+                    All Locations
+                </option>
+
+            </select>
+
+            <select id="pcFilter">
+
+                <option value="">
+                    All PC Makes
+                </option>
+
+            </select>
+
+        </div>
+
+        <!-- Export -->
+
+        <button id="exportBtn">
+
+            📥 Export Excel
+
+        </button>
+
+        <!-- KPI Cards -->
+
+        <div class="cards">
+
+    <div class="card total-card">
+        <h3>🖥 Total Assets</h3>
+        <h2 id="totalAssets">0</h2>
+    </div>
+
+    <div class="card tagged-card">
+        <h3>✅ Tagged Assets</h3>
+        <h2 id="taggedAssets">0</h2>
+    </div>
+
+    <div class="card pending-card">
+        <h3>⚠ Untagged Assets</h3>
+        <h2 id="pendingAssets">0</h2>
+    </div>
+
+</div>
+<div class="cards analytics-cards">
+
+    <div class="card">
+        <h3>📊 Completion Rate</h3>
+        <h2 id="completionRate">0%</h2>
+    </div>
+
+    <div class="card">
+        <h3>🏢 Departments</h3>
+        <h2 id="deptCount">0</h2>
+    </div>
+
+    <div class="card">
+        <h3>📍 Locations</h3>
+        <h2 id="locationCount">0</h2>
+    </div>
+
+    <div class="card">
+        <h3>💻 PC Makes</h3>
+        <h2 id="pcCount">0</h2>
+    </div>
+
+</div>
+
+        <!-- Department Chart -->
+
+        <div class="chart-container">
+
+            <canvas id="deptChart"></canvas>
+
+        </div>
+<div class="charts-row">
+
+    <div class="chart-card">
+        <canvas id="deptPieChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <canvas id="tagChart"></canvas>
+    </div>
+
+</div>
+        <!-- Asset Table -->
+
+        <div class="table-container">
+
+            <h2>Asset Details</h2>
+
+            <table id="assetTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Staff No</th>
+
+                        <th>Name</th>
+
+                        <th>Department</th>
+
+                        <th>Location</th>
+
+                        <th>PC Make</th>
+
+                        <th>Host Name</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="tableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- Asset Details Modal -->
+
+    <div id="assetModal"
+         class="modal">
+
+        <div class="modal-content">
+
+            <span id="closeModal">
+
+                &times;
+
+            </span>
+
+            <h2>Asset Details</h2>
+
+            <div id="assetDetails">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="{{ url_for('static',
+    filename='js/dashboard.js') }}">
+
+    </script>
+
+</body>
+
+</html>
