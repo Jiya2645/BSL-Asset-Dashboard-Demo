@@ -35,11 +35,11 @@ A web-based Asset Management Dashboard developed using Flask and Python for trac
 
 ### Employee Lookup
 
-![Employee Lookup](Screenshots/asset-table.png.png)
+![Employee Lookup](Screenshots/asset-table.png)
 
 ### Analytics
 
-![Department Summary](Screenshots/charts.png.png)
+![Department Summary](Screenshots/charts.png)
 
 ## Deployment
 
