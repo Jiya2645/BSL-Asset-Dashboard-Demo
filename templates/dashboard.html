@@ -30,10 +30,24 @@
 
         <h2>BSL Assets</h2>
 
-        <a href="/dashboard">
-            📊 Dashboard
-        </a>
+        <a href="#dashboardSection">
+    📊 Dashboard
+</a>
 
+<a href="#employeeSection">
+    👥 Employee Lookup
+</a>
+
+<a href="#chartsSection">
+    📊 Charts
+</a>
+
+<a href="#analyticsSection">
+    📈 Analytics
+</a>
+<a href="#" id="themeToggle">
+    🌙 Dark Mode
+</a>
         <a href="/logout">
             🚪 Logout
         </a>
@@ -56,6 +70,8 @@
                 </p>
 
             </div>
+            
+
 
         </div>
 
@@ -105,21 +121,36 @@
 
         <!-- KPI Cards -->
 
-        <div class="cards">
+       <div id="dashboardSection">
 
-    <div class="card total-card">
-        <h3>🖥 Total Assets</h3>
-        <h2 id="totalAssets">0</h2>
+<div class="cards asset-cards">
+
+    <div class="card asset-card">
+        <h3>🖥 PC Assets</h3>
+        <p>Total: <span id="pcTotal">3360</span></p>
+        <p>Tagged: <span id="pcTagged">2030</span></p>
+        <p>Untagged: <span id="pcUntagged">1330</span></p>
     </div>
 
-    <div class="card tagged-card">
-        <h3>✅ Tagged Assets</h3>
-        <h2 id="taggedAssets">0</h2>
+    <div class="card asset-card">
+        <h3>🖨 Printer Assets</h3>
+        <p>Total: <span id="printerTotal">941</span></p>
+        <p>Tagged: <span id="printerTagged">571</span></p>
+        <p>Untagged: <span id="printerUntagged">370</span></p>
     </div>
 
-    <div class="card pending-card">
-        <h3>⚠ Untagged Assets</h3>
-        <h2 id="pendingAssets">0</h2>
+    <div class="card asset-card">
+        <h3>📠 MFD Assets</h3>
+        <p>Total: <span id="mfdTotal">170</span></p>
+        <p>Tagged: <span id="mfdTagged">70</span></p>
+        <p>Untagged: <span id="mfdUntagged">100</span></p>
+    </div>
+
+    <div class="card asset-card">
+        <h3>📄 Scanner Assets</h3>
+        <p>Total: <span id="scannerTotal">486</span></p>
+        <p>Tagged: <span id="scannerTagged">290</span></p>
+        <p>Untagged: <span id="scannerUntagged">196</span></p>
     </div>
 
 </div>
@@ -146,10 +177,41 @@
     </div>
 
 </div>
+</div>
+    <div id="employeeSection"
+     class="employee-layout">
 
+    <div class="employee-list-panel">
+
+        <h2>Department Employees</h2>
+
+        <input
+            type="text"
+            id="employeeSearch"
+            placeholder="Search Employee">
+
+        <div id="employeeList">
+
+        </div>
+
+    </div>
+
+    <div class="employee-details-panel">
+
+        <h2>Employee Asset Details</h2>
+
+        <div id="employeeDetails">
+
+            Select an employee
+
+        </div>
+
+    </div>
+
+</div>
         <!-- Department Chart -->
-
-        <div class="chart-container">
+<div id="chartsSection"
+     class="chart-container">
 
             <canvas id="deptChart"></canvas>
 
@@ -165,66 +227,36 @@
     </div>
 
 </div>
-        <!-- Asset Table -->
+<div id="analyticsSection"
+     class="table-container">
 
-        <div class="table-container">
+    <h2>Department Performance</h2>
 
-            <h2>Asset Details</h2>
+    <table>
 
-            <table id="assetTable">
+        <thead>
 
-                <thead>
+            <tr>
+                <th>Department</th>
+                <th>Total</th>
+                <th>Tagged</th>
+                <th>Untagged</th>
+                <th>Completion %</th>
+            </tr>
 
-                    <tr>
+        </thead>
 
-                        <th>Staff No</th>
+        <tbody id="departmentBody">
 
-                        <th>Name</th>
+        </tbody>
 
-                        <th>Department</th>
+    </table>
 
-                        <th>Location</th>
+</div>
 
-                        <th>PC Make</th>
-
-                        <th>Host Name</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="tableBody">
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-    <!-- Asset Details Modal -->
-
-    <div id="assetModal"
-         class="modal">
-
-        <div class="modal-content">
-
-            <span id="closeModal">
-
-                &times;
-
-            </span>
-
-            <h2>Asset Details</h2>
-
-            <div id="assetDetails">
-
-            </div>
-
-        </div>
-
-    </div>
+    
+  
+    
 
     <script src="{{ url_for('static',
     filename='js/dashboard.js') }}">
@@ -232,5 +264,6 @@
     </script>
 
 </body>
+
 
 </html>

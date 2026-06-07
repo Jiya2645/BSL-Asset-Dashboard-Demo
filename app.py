@@ -7,43 +7,51 @@ import os
 import pandas as pd
 
 EXCEL_FILE = "PC PRINTER MFD SCANNER DETAILS 17 04 2026 - Copy.xlsx"
-
+PC_TOTALS = {}
+PRINTER_TOTALS = {}
+MFD_TOTALS = {}
+SCANNER_TOTALS = {}
 def load_department_totals():
     
-    totals = {}
+    global PC_TOTALS
+    global PRINTER_TOTALS
+    global MFD_TOTALS
+    global SCANNER_TOTALS
 
-    sheet_config = {
+    PC_TOTALS = {}
+    PRINTER_TOTALS = {}
+    MFD_TOTALS = {}
+    SCANNER_TOTALS = {}
 
-        "PC DETAILS": "TOTAL",
-        "PRINTER DETAIL": "TOTAL",
-        "MFD DETAIL": "TOTAL",
-        "SCANNER DETAILS": "TOTAL"
+    sheet_map = {
+
+        "PC DETAILS": PC_TOTALS,
+        "PRINTER DETAIL": PRINTER_TOTALS,
+        "MFD DETAIL": MFD_TOTALS,
+        "SCANNER DETAILS": SCANNER_TOTALS
 
     }
 
-    for sheet, total_column in sheet_config.items():
+    for sheet, target_dict in sheet_map.items():
 
         df = pd.read_excel(
-    EXCEL_FILE,
-    sheet_name=sheet,
-    header=2
-)
-        print("\n")
-        print(sheet)
-        print(df.columns.tolist())
+            EXCEL_FILE,
+            sheet_name=sheet,
+            header=2
+        )
 
         dept_col = df.columns[1]
 
-        actual_total_col = None
+        total_col = None
 
         for col in df.columns:
 
             if "TOTAL" in str(col).upper():
 
-                actual_total_col = col
+                total_col = col
                 break
 
-        if actual_total_col is None:
+        if total_col is None:
             continue
 
         for _, row in df.iterrows():
@@ -61,25 +69,21 @@ def load_department_totals():
                 continue
 
             count = pd.to_numeric(
-                row[actual_total_col],
+                row[total_col],
                 errors="coerce"
             )
 
             if pd.isna(count):
                 continue
 
-            dept = dept.upper()
+            target_dict[
+                dept.upper()
+            ] = int(count)
 
-            totals[dept] = (
-                totals.get(dept, 0)
-                + int(count)
-            )
-
-    print("GRAND TOTAL =", sum(totals.values()))
-
-    return totals
-
+    return True
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 app.secret_key = "bsl_asset_dashboard_2030_secret"
 
 # ---------------------------
@@ -92,8 +96,10 @@ DATA_FILE = os.path.join(
 )
 
 with open(DATA_FILE, "r", encoding="utf-8") as f:
+
     ALL_ASSETS = json.load(f)
-    DEPARTMENT_TOTALS = load_department_totals()
+
+load_department_totals()
    
 
 # ---------------------------
@@ -322,7 +328,7 @@ def stats():
 # ---------------------------
 @app.route("/api/department-summary")
 def department_summary():
-    
+
     department = request.args.get(
         "department",
         ""
@@ -331,14 +337,7 @@ def department_summary():
     assets = get_assets_for_user(
         session["user"]
     )
-    location = request.args.get(
-    "location",
-    ""
-).strip()
-    pc_make = request.args.get(
-    "pc_make",
-    ""
-).strip()
+
     if department:
 
         assets = [
@@ -348,27 +347,55 @@ def department_summary():
             if str(
                 a.get("Deptt.", "")
             ).strip() == department
+
         ]
 
-    tagged = len(assets)
+    pc_tagged = sum(
+        1 for a in assets
+        if str(a.get("LOT ID", "")).strip()
+    )
 
-    dept_lookup = {
+    printer_tagged = sum(
+        1 for a in assets
+        if str(a.get("PRINTER LOT ID", "")).strip()
+    )
 
-    str(k).strip().upper(): v
+    mfd_tagged = sum(
+        1 for a in assets
+        if str(a.get("MFD LOT ID", "")).strip()
+    )
 
-    for k, v in DEPARTMENT_TOTALS.items()
-}
+    scanner_tagged = sum(
+        1 for a in assets
+        if str(a.get("SCANNER LOT ID", "")).strip()
+    )
+
+    tagged = (
+        pc_tagged +
+        printer_tagged +
+        mfd_tagged +
+        scanner_tagged
+    )
 
     if department:
 
-      total = dept_lookup.get(
-        department.strip().upper(),
-        tagged
-    )
+        dept_key = department.upper()
+
+        total = (
+            PC_TOTALS.get(dept_key, 0)
+            + PRINTER_TOTALS.get(dept_key, 0)
+            + MFD_TOTALS.get(dept_key, 0)
+            + SCANNER_TOTALS.get(dept_key, 0)
+        )
 
     else:
 
-      total = 2230
+        total = (
+            sum(PC_TOTALS.values())
+            + sum(PRINTER_TOTALS.values())
+            + sum(MFD_TOTALS.values())
+            + sum(SCANNER_TOTALS.values())
+        )
 
     pending = max(
         total - tagged,
@@ -379,18 +406,124 @@ def department_summary():
         (tagged / total) * 100,
         1
     ) if total else 0
-    
+
     return jsonify({
 
         "total": total,
-
         "tagged": tagged,
-
         "pending": pending,
-
         "completion": completion
 
     })
+@app.route("/employees")
+def employees():
+
+    if "user" not in session:
+        return redirect(url_for("home"))
+
+    return render_template(
+        "employees.html",
+        user=session["user"]
+    )
+@app.route("/departments")
+def departments():
+
+    if "user" not in session:
+        return redirect(url_for("home"))
+
+    return render_template(
+        "departments.html",
+        user=session["user"]
+    )
+@app.route("/api/department-report")
+def department_report():
+
+    report = []
+
+    departments = set()
+
+    departments.update(PC_TOTALS.keys())
+    departments.update(PRINTER_TOTALS.keys())
+    departments.update(MFD_TOTALS.keys())
+    departments.update(SCANNER_TOTALS.keys())
+
+    for dept in sorted(departments):
+
+        total = (
+            PC_TOTALS.get(dept, 0)
+            + PRINTER_TOTALS.get(dept, 0)
+            + MFD_TOTALS.get(dept, 0)
+            + SCANNER_TOTALS.get(dept, 0)
+        )
+
+        assets = [
+
+            a for a in ALL_ASSETS
+
+            if str(
+                a.get("Deptt.", "")
+            ).strip().upper() == dept
+
+        ]
+
+        tagged = 0
+
+        for asset in assets:
+
+            if str(asset.get("LOT ID", "")).strip():
+                tagged += 1
+
+            if str(asset.get("PRINTER LOT ID", "")).strip():
+                tagged += 1
+
+            if str(asset.get("MFD LOT ID", "")).strip():
+                tagged += 1
+
+            if str(asset.get("SCANNER LOT ID", "")).strip():
+                tagged += 1
+
+        untagged = max(total - tagged, 0)
+
+        completion = round(
+            (tagged / total) * 100,
+            1
+        ) if total else 0
+
+        report.append({
+
+            "department": dept,
+            "total": total,
+            "tagged": tagged,
+            "untagged": untagged,
+            "completion": completion
+
+        })
+
+    return jsonify(report)
+@app.route("/api/employees")
+def employees_api():
+
+    assets = get_assets_for_user(
+        session["user"]
+    )
+
+    return jsonify(assets)
+@app.route("/analytics")
+def analytics():
+
+    if "user" not in session:
+        return redirect(url_for("home"))
+
+    return render_template(
+        "analytics.html",
+        user=session["user"]
+    )
+@app.route("/api/analytics")
+def analytics_api():
+
+    report = department_report().json
+
+    return jsonify(report)
 @app.route("/api/assets")
 def assets():
 
@@ -601,10 +734,11 @@ def dashboard_metrics():
 
     locations = set()
     pc_makes = set()
+    departments = set()
 
     assets = get_assets_for_user(
-    session["user"]
-)
+        session["user"]
+    )
 
     for asset in assets:
 
@@ -622,13 +756,116 @@ def dashboard_metrics():
             )
         )
 
+        departments.add(
+            asset.get(
+                "Deptt.",
+                ""
+            )
+        )
+
     return jsonify({
 
         "locations":
         len(locations),
 
         "pc_makes":
-        len(pc_makes)
+        len(pc_makes),
+
+        "departments":
+        len(departments)
+
+    })
+@app.route("/api/asset-breakdown")
+def asset_breakdown():
+
+    department = request.args.get(
+        "department",
+        ""
+    ).strip()
+
+    assets = get_assets_for_user(
+        session["user"]
+    )
+
+    if department:
+
+        assets = [
+
+            a for a in assets
+
+            if str(
+                a.get("Deptt.", "")
+            ).strip() == department
+
+        ]
+
+    pc_tagged = 0
+    printer_tagged = 0
+    mfd_tagged = 0
+    scanner_tagged = 0
+
+    for asset in assets:
+
+        if str(asset.get("LOT ID", "")).strip():
+            pc_tagged += 1
+
+        if str(asset.get("PRINTER LOT ID", "")).strip():
+            printer_tagged += 1
+
+        if str(asset.get("MFD LOT ID", "")).strip():
+            mfd_tagged += 1
+
+        if str(asset.get("SCANNER LOT ID", "")).strip():
+            scanner_tagged += 1
+
+    dept_key = department.upper()
+
+    pc_total = PC_TOTALS.get(
+        dept_key,
+        3360 if not department else 0
+    )
+
+    printer_total = PRINTER_TOTALS.get(
+        dept_key,
+        941 if not department else 0
+    )
+
+    mfd_total = MFD_TOTALS.get(
+        dept_key,
+        170 if not department else 0
+    )
+
+    scanner_total = SCANNER_TOTALS.get(
+        dept_key,
+        486 if not department else 0
+    )
+
+    return jsonify({
+
+        "pc": {
+            "total": pc_total,
+            "tagged": pc_tagged,
+            "untagged": max(pc_total - pc_tagged, 0)
+        },
+
+        "printer": {
+            "total": printer_total,
+            "tagged": printer_tagged,
+            "untagged": max(printer_total - printer_tagged, 0)
+        },
+
+        "mfd": {
+            "total": mfd_total,
+            "tagged": mfd_tagged,
+            "untagged": max(mfd_total - mfd_tagged, 0)
+        },
+
+        "scanner": {
+            "total": scanner_total,
+            "tagged": scanner_tagged,
+            "untagged": max(scanner_total - scanner_tagged, 0)
+        }
+
 
     })
 if __name__ == "__main__":

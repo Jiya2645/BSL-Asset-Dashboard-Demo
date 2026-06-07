@@ -116,7 +116,7 @@ body{
 
 .cards{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(4,1fr);
     gap:20px;
     margin-bottom:25px;
 }
@@ -128,7 +128,152 @@ body{
     box-shadow:0 8px 20px rgba(0,0,0,0.08);
     transition:0.3s;
 }
+.asset-card{
 
+    border:none;
+
+    border-radius:22px;
+
+    padding:25px;
+
+    color:white;
+
+    position:relative;
+
+    overflow:hidden;
+
+    transition:.3s;
+
+    box-shadow:
+        0 12px 25px rgba(0,0,0,.12);
+}
+
+/* PC Card */
+
+.asset-card:nth-child(1){
+
+    background:
+    linear-gradient(
+        135deg,
+        #2563eb,
+        #60a5fa
+    );
+}
+
+/* Printer Card */
+
+.asset-card:nth-child(2){
+
+    background:
+    linear-gradient(
+        135deg,
+        #16a34a,
+        #4ade80
+    );
+}
+
+/* MFD Card */
+
+.asset-card:nth-child(3){
+
+    background:
+    linear-gradient(
+        135deg,
+        #ea580c,
+        #fb923c
+    );
+}
+
+/* Scanner Card */
+
+.asset-card:nth-child(4){
+
+    background:
+    linear-gradient(
+        135deg,
+        #9333ea,
+        #c084fc
+    );
+}
+
+.asset-card h3{
+
+    color:white;
+
+    font-size:20px;
+
+    margin-bottom:18px;
+}
+
+.asset-card p{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin:10px 0;
+
+    color:white;
+
+    font-size:16px;
+}
+
+.asset-card span{
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:700;
+}
+
+.asset-card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:
+        0 20px 35px rgba(0,0,0,.18);
+}
+
+.asset-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:-40px;
+
+    right:-40px;
+
+    width:130px;
+
+    height:130px;
+
+    border-radius:50%;
+
+    background:
+    rgba(255,255,255,.15);
+}
+
+.asset-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    bottom:-50px;
+
+    left:-50px;
+
+    width:150px;
+
+    height:150px;
+
+    border-radius:50%;
+
+    background:
+    rgba(255,255,255,.08);
+}
 .card:hover{
     transform:translateY(-5px);
     box-shadow:0 15px 25px rgba(0,0,0,0.12);
@@ -329,4 +474,177 @@ tr:hover{
     border-top:1px solid #e5e7eb;
     margin:20px 0;
 }
+}
+.employee-layout{
+
+    display:grid;
+
+    grid-template-columns:300px 1fr;
+
+    gap:20px;
+
+    margin-top:20px;
+}
+
+.employee-list-panel,
+.employee-details-panel{
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+#employeeList{
+
+    max-height:600px;
+
+    overflow-y:auto;
+}
+
+.employee-item{
+
+    padding:12px;
+
+    border-bottom:1px solid #e5e7eb;
+
+    cursor:pointer;
+}
+
+.employee-item:hover{
+
+    background:#eff6ff;
+}
+
+#employeeDetails{
+
+    line-height:2;
+}
+#themeToggle{
+
+    padding:12px 20px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#1e293b;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:15px;
+}
+body.dark-mode{
+
+    background:#0f172a;
+
+    color:#f1f5f9;
+}
+
+body.dark-mode .sidebar{
+
+    background:#1e293b;
+
+    border-right:none;
+}
+
+body.dark-mode .sidebar h2,
+body.dark-mode .sidebar a{
+
+    color:white;
+}
+
+body.dark-mode .main{
+
+    color:white;
+}
+
+body.dark-mode .chart-container,
+body.dark-mode .chart-card,
+body.dark-mode .employee-list-panel,
+body.dark-mode .employee-details-panel,
+body.dark-mode .table-container,
+body.dark-mode .analytics-cards .card{
+
+    background:#1e293b;
+
+    color:white;
+}
+
+body.dark-mode table{
+
+    color:white;
+}
+
+body.dark-mode th{
+
+    background:#334155;
+
+    color:white;
+}
+
+body.dark-mode tr:hover{
+
+    background:#475569;
+}
+
+body.dark-mode #searchBox,
+body.dark-mode #employeeSearch,
+body.dark-mode select{
+
+    background:#334155;
+
+    color:white;
+
+    border:1px solid #475569;
+}
+
+body.dark-mode .modal-content{
+
+    background:#1e293b;
+
+    color:white;
+}
+.table-container{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+#departmentTable{
+
+    width:100%;
+
+    border-collapse:collapse;
+}
+
+#departmentTable th{
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:15px;
+}
+
+#departmentTable td{
+
+    padding:12px;
+
+    border-bottom:1px solid #e5e7eb;
+}
+
+#departmentTable tr:hover{
+
+    background:#eff6ff;
 }

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Analytics</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+          filename='css/dashboard.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="main">
+
+    <h1>Analytics Dashboard</h1>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>🏆 Best Department</h3>
+            <h2 id="bestDept">-</h2>
+        </div>
+
+        <div class="card">
+            <h3>📉 Lowest Completion</h3>
+            <h2 id="worstDept">-</h2>
+        </div>
+
+        <div class="card">
+            <h3>🏷 Total Tagged</h3>
+            <h2 id="totalTagged">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>📦 Total Assets</h3>
+            <h2 id="totalAssets">0</h2>
+        </div>
+
+    </div>
+
+    <div class="chart-container">
+        <canvas id="completionChart"></canvas>
+    </div>
+
+</div>
+
+<script src="{{ url_for('static',
+filename='js/analytics.js') }}"></script>
+
+</body>
+</html>

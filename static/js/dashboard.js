@@ -103,15 +103,24 @@ function loadAssets() {
         .then(response => response.json())
 
         .then(data => {
-            const search =
-                document.getElementById('searchBox')
-                    .value
-                    .toLowerCase();
+            const globalSearch =
+    document.getElementById(
+        'searchBox'
+    )
+    .value
+    .toLowerCase();
+
+const employeeSearch =
+    document.getElementById(
+        'employeeSearch'
+    )
+    .value
+    .toLowerCase();
 
             const department =
                 document.getElementById('departmentFilter')
                     .value;
-
+                    
             const location =
                 document.getElementById('locationFilter')
                     .value;
@@ -120,21 +129,31 @@ function loadAssets() {
                 document.getElementById('pcFilter')
                     .value;
 
-            const body =
-                document.getElementById('tableBody');
-
-            body.innerHTML = '';
+            
 
 
             const filtered = data.filter(asset => {
 
-                const matchesSearch =
+               const matchesSearch =
+    (
+        !globalSearch ||
 
-                    !search ||
+        JSON.stringify(asset)
+            .toLowerCase()
+            .includes(globalSearch)
+    )
 
-                    JSON.stringify(asset)
-                        .toLowerCase()
-                        .includes(search);
+    &&
+
+    (
+        !employeeSearch ||
+
+        String(
+            asset["Name"] || ""
+        )
+        .toLowerCase()
+        .includes(employeeSearch)
+    );
 
                 const matchesDept =
 
@@ -163,13 +182,66 @@ function loadAssets() {
 
                 );
 
-            });
+            })
+            renderEmployeeList(
+    filtered
+);
+if(filtered.length > 0){
 
+    renderEmployeeDetails(
+        filtered[0]
+    );
+
+}
             const dept =
                 document.getElementById(
                     "departmentFilter"
                 ).value;
+                fetch(
+    `/api/asset-breakdown?department=${encodeURIComponent(dept)}`
+)
 
+.then(response => response.json())
+
+.then(data => {
+
+    document.getElementById("pcTotal").innerText =
+        data.pc.total;
+
+    document.getElementById("pcTagged").innerText =
+        data.pc.tagged;
+
+    document.getElementById("pcUntagged").innerText =
+        data.pc.untagged;
+
+    document.getElementById("printerTotal").innerText =
+        data.printer.total;
+
+    document.getElementById("printerTagged").innerText =
+        data.printer.tagged;
+
+    document.getElementById("printerUntagged").innerText =
+        data.printer.untagged;
+
+    document.getElementById("mfdTotal").innerText =
+        data.mfd.total;
+
+    document.getElementById("mfdTagged").innerText =
+        data.mfd.tagged;
+
+    document.getElementById("mfdUntagged").innerText =
+        data.mfd.untagged;
+
+    document.getElementById("scannerTotal").innerText =
+        data.scanner.total;
+
+    document.getElementById("scannerTagged").innerText =
+        data.scanner.tagged;
+
+    document.getElementById("scannerUntagged").innerText =
+        data.scanner.untagged;
+
+});
             fetch(
                 `/api/department-summary?department=${encodeURIComponent(dept)}`
             )
@@ -178,59 +250,19 @@ function loadAssets() {
 
                 .then(summary => {
 
-                    document.getElementById(
-                        "totalAssets"
-                    ).innerText =
-                        summary.total;
+    document.getElementById(
+        "completionRate"
+    ).innerText =
+        summary.completion + "%";
 
-                    document.getElementById(
-                        "taggedAssets"
-                    ).innerText =
-                        summary.tagged;
+    updateCharts(
+        filtered,
+        summary.tagged,
+        summary.pending
+    );
 
-                    document.getElementById(
-                        "pendingAssets"
-                    ).innerText =
-                        summary.pending;
-
-                    document.getElementById(
-                        "completionRate"
-                    ).innerText =
-                        summary.completion + "%";
-
-                    updateCharts(filtered, summary.tagged, summary.pending);
-
-                });
-
-            filtered
-                .slice(0, 100)
-                .forEach(asset => {
-
-                    const row =
-                        document.createElement('tr');
-
-                    row.innerHTML = `
-
-        <td>${asset["Staff No."] || ""}</td>
-        <td>${asset["Name"] || ""}</td>
-        <td>${asset["Deptt."] || ""}</td>
-        <td>${asset["Location"] || ""}</td>
-        <td>${asset["PC Make"] || ""}</td>
-        <td>${asset["HOST NAME"] || ""}</td>
-
-    `;
-
-                    row.style.cursor = 'pointer';
-
-                    row.addEventListener('click', () => {
-
-                        showAssetDetails(asset);
-
-                    });
-
-                    body.appendChild(row);
-
-                });
+});
+        
 
         });
 
@@ -306,7 +338,7 @@ document
 
 
 
-function showAssetDetails(asset) {
+/*function showAssetDetails(asset) {
 
     const modal =
         document.getElementById("assetModal");
@@ -418,7 +450,7 @@ window.onclick = function (event) {
     }
 
 };
-
+*/
 
 
 loadAssets();
@@ -427,6 +459,12 @@ fetch('/api/dashboard-metrics')
     .then(response => response.json())
 
     .then(data => {
+        document
+    .getElementById(
+        "deptCount"
+    )
+    .innerText =
+    data.departments;
 
         document
             .getElementById(
@@ -443,3 +481,203 @@ fetch('/api/dashboard-metrics')
             data.pc_makes;
 
     });
+    function renderEmployeeList(filtered){
+
+    const list =
+        document.getElementById(
+            "employeeList"
+        );
+
+    list.innerHTML = "";
+
+    filtered.forEach(asset => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "employee-item";
+
+        div.innerHTML = `
+
+            <strong>
+                ${asset["Name"] || ""}
+            </strong>
+
+            <br>
+
+            ${asset["Staff No."] || ""}
+
+        `;
+
+        div.onclick = () => {
+
+            renderEmployeeDetails(
+                asset
+            );
+
+        };
+
+        list.appendChild(div);
+
+    });
+
+}
+function renderEmployeeDetails(asset){
+
+    document.getElementById(
+        "employeeDetails"
+    ).innerHTML = `
+
+        <h3>
+            ${asset["Name"] || "-"}
+        </h3>
+
+        <p>
+        Staff No:
+        ${asset["Staff No."] || "-"}
+        </p>
+
+        <p>
+        Department:
+        ${asset["Deptt."] || "-"}
+        </p>
+
+        <hr>
+
+        <h3>💻 PC</h3>
+
+        <p>
+        Make:
+        ${asset["PC Make"] || "-"}
+        </p>
+
+        <p>
+        Model:
+        ${asset["PC Model"] || "-"}
+        </p>
+
+        <p>
+        Host:
+        ${asset["HOST NAME"] || "-"}
+        </p>
+
+        <hr>
+
+        <h3>🖨 Printer</h3>
+
+        <p>
+        ${asset["Printer Make"] || "-"}
+        </p>
+
+        <hr>
+
+        <h3>📠 MFD</h3>
+
+        <p>
+        ${asset["MFD MAKE"] || "-"}
+        </p>
+
+        <hr>
+
+        <h3>📄 Scanner</h3>
+
+        <p>
+        ${asset["Scanner Make"] || "-"}
+        </p>
+
+    `;
+}
+document
+.getElementById(
+    "employeeSearch"
+)
+.addEventListener(
+    "keyup",
+    loadAssets
+);
+const themeBtn =
+    document.getElementById(
+        "themeToggle"
+    );
+
+themeBtn.addEventListener(
+    "click",
+    () => {
+
+        document.body.classList.toggle(
+            "dark-mode"
+        );
+
+        if(
+            document.body.classList.contains(
+                "dark-mode"
+            )
+        ){
+
+            themeBtn.innerText =
+                "☀️ Light Mode";
+
+            localStorage.setItem(
+                "theme",
+                "dark"
+            );
+
+        }else{
+
+            themeBtn.innerText =
+                "🌙 Dark Mode";
+
+            localStorage.setItem(
+                "theme",
+                "light"
+            );
+        }
+    }
+);
+
+if(
+    localStorage.getItem(
+        "theme"
+    ) === "dark"
+){
+
+    document.body.classList.add(
+        "dark-mode"
+    );
+
+    themeBtn.innerText =
+        "☀️ Light Mode";
+}
+fetch('/api/department-report')
+
+.then(response => response.json())
+
+.then(data => {
+
+    const body =
+        document.getElementById(
+            "departmentBody"
+        );
+
+    if(!body) return;
+
+    data.forEach(row => {
+
+        body.innerHTML += `
+
+        <tr>
+
+            <td>${row.department}</td>
+            <td>${row.total}</td>
+            <td>${row.tagged}</td>
+            <td>${row.untagged}</td>
+            <td>${row.completion}%</td>
+
+        </tr>
+
+        `;
+
+    });
+
+});

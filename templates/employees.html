@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Employee Lookup</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+          filename='css/dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <img src="{{ url_for('static',
+    filename='images/logo.png') }}"
+    class="sidebar-logo">
+
+    <h2>BSL Assets</h2>
+
+    <a href="/dashboard">
+        📊 Dashboard
+    </a>
+
+    <a href="/employees">
+        👥 Employee Lookup
+    </a>
+
+    <a href="/departments">
+        🏢 Department Summary
+    </a>
+
+    <a href="/logout">
+        🚪 Logout
+    </a>
+
+</div>
+
+<div class="main">
+
+    <h1>Employee Lookup</h1>
+
+    <div class="employee-layout">
+
+        <div class="employee-list-panel">
+
+            <h2>Employees</h2>
+
+            <div id="employeeList">
+
+                <div id="employeeList"></div>
+
+            </div>
+
+        </div>
+
+        <div class="employee-details-panel">
+
+            <h2>Asset Details</h2>
+
+            <div id="employeeDetails">
+
+                Select an employee
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+fetch('/api/employees')
+
+.then(res => res.json())
+
+.then(data => {
+
+    const list =
+        document.getElementById(
+            "employeeList"
+        );
+
+    data.forEach(emp => {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+        div.className =
+            "employee-item";
+
+        div.innerHTML = `
+
+            <strong>
+                ${emp.Name || ''}
+            </strong>
+            <br>
+            ${emp["Staff No."] || ''}
+
+        `;
+
+        div.onclick = () => {
+
+            document.getElementById(
+                "employeeDetails"
+            ).innerHTML = `
+
+                <h3>${emp.Name || ''}</h3>
+
+                <p>
+                Staff:
+                ${emp["Staff No."] || ''}
+                </p>
+
+                <p>
+                Department:
+                ${emp["Deptt."] || ''}
+                </p>
+
+                <p>
+                PC:
+                ${emp["PC Make"] || ''}
+                </p>
+
+                <p>
+                Host:
+                ${emp["HOST NAME"] || ''}
+                </p>
+
+            `;
+        };
+
+        list.appendChild(div);
+
+    });
+
+});
+
+</script>
+</body>
+
+</html>

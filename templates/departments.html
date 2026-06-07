@@ -1,0 +1,64 @@
+<div class="main">
+
+    <h1>Department Summary</h1>
+
+    <div class="table-container">
+
+        <table id="departmentTable">
+
+            <thead>
+
+                <tr>
+                    <th>Department</th>
+                    <th>Total Assets</th>
+                    <th>Tagged</th>
+                    <th>Untagged</th>
+                    <th>Completion %</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="departmentBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+fetch('/api/department-report')
+
+.then(response => response.json())
+
+.then(data => {
+
+    const body =
+        document.getElementById(
+            "departmentBody"
+        );
+
+    data.forEach(row => {
+
+        body.innerHTML += `
+
+        <tr>
+            <td>${row.department}</td>
+            <td>${row.total}</td>
+            <td>${row.tagged}</td>
+            <td>${row.untagged}</td>
+            <td>${row.completion}%</td>
+        </tr>
+
+        `;
+    });
+
+});
+
+</script>
+
+</body>
+</html>
